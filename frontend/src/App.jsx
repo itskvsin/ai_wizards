@@ -1,6 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
-import { Bar } from 'recharts';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+import { Bar } from 'react-chartjs-2';
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -312,24 +320,52 @@ const App = () => {
     }
   };
 
-  const YieldChart = ({ prediction }) => {
-    if (!prediction) return null;
+const YieldChart = ({ prediction }) => {
+  if (!prediction) return null;
 
-    const avgYield = prediction.yieldPerHectare / 1.1;
-    const potentialYield = prediction.yieldPerHectare * 1.2;
+  const avgYield = prediction.yieldPerHectare / 1.1;
+  const potentialYield = prediction.yieldPerHectare * 1.2;
 
-    const chartData = [
-      { name: 'Regional Average', yield: avgYield },
-      { name: 'Your Predicted Yield', yield: prediction.yieldPerHectare },
-      { name: 'Potential with Optimization', yield: potentialYield }
-    ];
-
-    return (
-      <div className="w-full h-64">
-        <Bar data={chartData} />
-      </div>
-    );
+  const data = {
+    labels: ['Regional Average', 'Your Predicted Yield', 'Potential with Optimization'],
+    datasets: [
+      {
+        label: 'Yield (tons/hectare)',
+        data: [avgYield, prediction.yieldPerHectare, potentialYield],
+        backgroundColor: ['#60a5fa', '#34d399', '#fbbf24'],
+        borderRadius: 12,
+      },
+    ],
   };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Yield Comparison',
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          callback: (value) => `${value} t/ha`,
+        },
+      },
+    },
+  };
+
+  return (
+    <div className="w-full h-72">
+      <Bar data={data} options={options} />
+    </div>
+  );
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-500 to-purple-600 text-gray-800">
